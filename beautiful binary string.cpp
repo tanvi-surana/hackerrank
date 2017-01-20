@@ -1,58 +1,85 @@
-#include <cmath>
-#include <cstdio>
-#include <vector>
-#include <iostream>
-#include <cstring>
-#include <algorithm>
+#include <bits/stdc++.h> 
 using namespace std;
 
-bool checkIfPalindrome(string str)
-{
-    int l=0,h=str.length()-1;
-    
-    while(l<=h)
-    {
-        if(str[l]!=str[h])
-            return false;
-        l++;
-        h--;
-            
-    }     
-    
-    return true;
-}
+#define PRIME 3
 
-
-void calculate()
+int calculateHash(string str,int len)
 {
-    string str;
-    cin>>str;
-    if(checkIfPalindrome(str))
+    long long res=0;
+    for(int i=0;i<len;i++)
     {
-        cout<<"-1"<<endl;
-        return;
-    } 
-    else
-    {
-        for(int i=0;i<str.length();i++)
-        {
-            string strN=str.substr(0,i)+str.substr(i+1);
-            if(checkIfPalindrome(strN))
-            {
-                cout<<i<<endl;
-                return;
-            }    
-        }    
+        res+=str[i]*pow(PRIME,i);
     }    
+    
+    return res;
 }    
 
-int main() {
-    ios_base::sync_with_stdio(0);
-    int t;
-    cin>>t;
-    while(t--)
+int calculate(string str,int len)
+{
+    string pattern="010";
+    long long tHash=calculateHash(str,3);
+    long long pHash=calculateHash(pattern,3);
+    
+    int count=0;
+   // cout<<pHash<<endl;
+    for(int i=0;i<len-3+1;)
     {
-        calculate();
-    }
+        bool change=false;
+        //cout<<i<<" "<<tHash<<endl;
+        if(tHash == pHash)
+        {
+            //check if the strings match
+            bool flag=true;
+            for(int i1=0;i1<3;i1++)
+            {
+                if(pattern[i1] != str[i+i1])
+                {
+                    flag=false;
+                    break;
+                }    
+            }
+            if(flag)
+            {
+                i=i+3;
+                count++;
+                change=true;
+            }    
+        }
+        
+        //recalculating the hash
+        if(change)
+        {
+            if(i<len-2)
+            {
+                tHash=0;
+                int x=i;
+                for(int j=0;j<3;j++)
+                {
+                    tHash+=str[x]*pow(PRIME,j);
+                    x++;
+                }  
+            }    
+        }
+        else
+        {
+            tHash-=str[i];
+            tHash/=3;
+            tHash+=str[i+3]*pow(PRIME,2);
+            i++;
+        }    
+        
+        
+    } 
+    
+    return count;    
+    
+}
+
+int main(){
+    int n;
+    cin >> n;
+    string B;
+    cin >> B;
+    cout<<calculate(B,n);
     return 0;
 }
